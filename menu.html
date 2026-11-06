@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <!-- 모바일 앱처럼 보이게 하는 메타 태그 (Safe area, 핀치줌 방지 등) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#27ae60">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>쌍둥이 유아식 밀프렙</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Noto Sans KR"', 'sans-serif'] },
+                    colors: {
+                        primary: '#27ae60', // 메인 파스텔 그린
+                        secondary: '#2ecc71',
+                        bglight: '#f4f9f6',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f4f9f6; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+        /* Hide scrollbar for clean app look */
+        ::-webkit-scrollbar { display: none; }
+        
+        .safe-pb { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        .safe-pt { padding-top: env(safe-area-inset-top, 0px); }
+
+        /* Checkbox custom (장보기 탭 전용) */
+        .custom-checkbox {
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+        .custom-checkbox:checked {
+            background-color: #27ae60;
+            border-color: #27ae60;
+        }
+        .custom-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            left: 7px; top: 3px;
+            width: 6px; height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden text-gray-800">
+
+    <!-- Header -->
+    <header class="bg-primary text-white pt-safe shadow-md z-20 relative">
+        <div class="safe-pt flex items-center justify-between px-4 h-14">
+            <h1 class="text-lg font-bold">👶👶 쌍둥이 유아식 플래너</h1>
+            <button onclick="toggleModal('a2hs-modal')" class="p-2 bg-white/20 rounded-full active:bg-white/30 transition">
+                <!-- Info/Download Icon -->
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Scrollable Content -->
+    <main id="app-content" class="flex-1 overflow-y-auto w-full pb-24 safe-pb bg-bglight relative">
+        <!-- 콘텐츠가 JS로 렌더링 됩니다 -->
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bg-white border-t border-gray-200 fixed bottom-0 w-full z-20 safe-pb">
+        <div class="flex justify-around items-center h-16 px-2">
+            <button onclick="switchTab('plan')" id="nav-plan" class="flex flex-col items-center justify-center w-full h-full text-primary transition">
+                <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path></svg>
+                <span class="text-[10px] font-bold">식단표</span>
+            </button>
+            <button onclick="switchTab('prep')" id="nav-prep" class="flex flex-col items-center justify-center w-full h-full text-gray-400 transition">
+                <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.455a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.455A1 1 0 0112 2z" clip-rule="evenodd"></path></svg>
+                <span class="text-[10px] font-bold">밀프렙</span>
+            </button>
+            <button onclick="switchTab('grocery')" id="nav-grocery" class="flex flex-col items-center justify-center w-full h-full text-gray-400 transition">
+                <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"></path></svg>
+                <span class="text-[10px] font-bold">장보기</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- A2HS Modal (Add to Home Screen) -->
+    <div id="a2hs-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex-col items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl relative transform transition-all">
+            <button onclick="toggleModal('a2hs-modal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-xl font-bold text-primary mb-2">📱 앱처럼 사용하기</h3>
+            <p class="text-sm text-gray-600 mb-5">이 페이지를 홈 화면에 추가하면 진짜 어플리케이션처럼 편리하게 사용할 수 있습니다.</p>
+            
+            <div class="space-y-4">
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                    <h4 class="font-bold flex items-center gap-2 mb-1"><span class="text-xl">🍎</span> 아이폰 (Safari)</h4>
+                    <p class="text-xs text-gray-500 leading-relaxed">하단 메뉴바에서 <strong>공유(아이콘)</strong> 버튼을 누른 후,<br><strong class="text-gray-800">'홈 화면에 추가'</strong>를 선택하세요.</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                    <h4 class="font-bold flex items-center gap-2 mb-1"><span class="text-xl">🤖</span> 안드로이드 (Chrome)</h4>
+                    <p class="text-xs text-gray-500 leading-relaxed">우측 상단 <strong>메뉴(⋮)</strong> 버튼을 누른 후,<br><strong class="text-gray-800">'홈 화면에 추가'</strong>를 선택하세요.</p>
+                </div>
+            </div>
+            <button onclick="toggleModal('a2hs-modal')" class="w-full bg-primary text-white font-bold py-3 rounded-xl mt-5 active:bg-secondary">확인했습니다</button>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // ----------------------------------------------------
+        // Data Configuration
+        // ----------------------------------------------------
+        const GROCERY_DATA = [
+            { category: '🥩 단백질', items: [ { id: 'g1', name: '소고기 우둔/안심 다짐육 (250g)' }, { id: 'g2', name: '닭안심 (250g)' }, { id: 'g3', name: '돼지안심 다짐육 (250g)' }, { id: 'g4', name: '새우살 또는 대구살 (200g)' }, { id: 'g5', name: '신선란 1판 (아침 노른자용)' }, { id: 'g6', name: '순두부 1봉 & 연두부 1팩' } ] },
+            { category: '🥦 채소/과일', items: [ { id: 'v1', name: '무 1토막 & 애호박 1개' }, { id: 'v2', name: '단호박 1통 (또는 냉동)' }, { id: 'v3', name: '양배추 1/4통 & 사과 2알' }, { id: 'v4', name: '감자 2개 & 고구마 2개' }, { id: 'v5', name: '가지 또는 브로콜리' } ] },
+            { category: '🧂 양념/기타', items: [ { id: 'e1', name: '다시마 & 건표고 (채수용)' }, { id: 'e2', name: '감자전분 (농도 조절)' }, { id: 'e3', name: '아기 첫 치즈 (1단계)' }, { id: 'e4', name: '생들기름 / 참깨' } ] }
+        ];
+
+        // 쌍둥이 맞춤 소스 순환식 규칙 반영 완료
+        const MEAL_PLAN = {
+            'A': [
+                { id: 'mon', day: '월', meals: [ 
+                    { type: '아침', name: '연두부 노른자 몽글찜' }, 
+                    { badge: '소스①', name: '소고기 무 애호박 덮밥' }, 
+                    { badge: '소스②', badgeColor: 'bg-sky-100 text-sky-700', name: '새우 순두부 노른자 덮밥' } 
+                ]},
+                { id: 'tue', day: '화', meals: [ 
+                    { type: '아침', name: '단호박 치즈 매시 볼' }, 
+                    { badge: '소스②', badgeColor: 'bg-sky-100 text-sky-700', name: '새우 순두부 노른자 덮밥' }, 
+                    { badge: '소스①', name: '소고기 무 애호박 덮밥' } 
+                ]},
+                { id: 'wed', day: '수', meals: [ 
+                    { type: '아침', name: '감자 들깨 노른자 비빔' }, 
+                    { badge: '소스①', name: '소고기 무 애호박 덮밥' }, 
+                    { badge: '소스②', badgeColor: 'bg-sky-100 text-sky-700', name: '새우 순두부 노른자 덮밥' } 
+                ]},
+                { id: 'thu', day: '목', meals: [ 
+                    { type: '아침', name: '연두부 노른자 몽글찜' }, 
+                    { badge: '소스③', badgeColor: 'bg-amber-100 text-amber-700', name: '닭안심 고구마 리조또' }, 
+                    { badge: '소스④', badgeColor: 'bg-pink-100 text-pink-700', name: '돼지안심 사과 양배추 조림' } 
+                ]},
+                { id: 'fri', day: '금', meals: [ 
+                    { type: '아침', name: '단호박 치즈 매시 볼' }, 
+                    { badge: '소스④', badgeColor: 'bg-pink-100 text-pink-700', name: '돼지안심 사과 양배추 조림' }, 
+                    { badge: '소스③', badgeColor: 'bg-amber-100 text-amber-700', name: '닭안심 고구마 리조또' } 
+                ]},
+                { id: 'sat', day: '토', meals: [ 
+                    { type: '아침', name: '감자 들깨 노른자 비빔' }, 
+                    { badge: '소스③', badgeColor: 'bg-amber-100 text-amber-700', name: '닭안심 고구마 리조또' }, 
+                    { badge: '소스④', badgeColor: 'bg-pink-100 text-pink-700', name: '돼지안심 사과 양배추 조림' } 
+                ]},
+                { id: 'sun', day: '일', meals: [ 
+                    { type: '아침', name: '바나나 오트밀 포리지 (노른자)' }, 
+                    { badge: '냉파', badgeColor:'bg-gray-200 text-gray-700', name: '냉동고 잔여 소스 소진' }, 
+                    { badge: '특식', badgeColor:'bg-emerald-100 text-emerald-800', name: '대구 순살 감자 퓨레 비빔' } 
+                ]}
+            ],
+            'B': [
+                { id: 'mon', day: '월', meals: [ 
+                    { type: '아침', name: '연두부 노른자 몽글찜' }, 
+                    { badge: '소스①', name: '소고기 가지 토마토 덮밥' }, 
+                    { badge: '소스②', badgeColor: 'bg-sky-100 text-sky-700', name: '대구살 감자 브로콜리 덮밥' } 
+                ]},
+                { id: 'tue', day: '화', meals: [ 
+                    { type: '아침', name: '단호박 치즈 매시 볼' }, 
+                    { badge: '소스②', badgeColor: 'bg-sky-100 text-sky-700', name: '대구살 감자 브로콜리 덮밥' }, 
+                    { badge: '소스①', name: '소고기 가지 토마토 덮밥' } 
+                ]},
+                { id: 'wed', day: '수', meals: [ 
+                    { type: '아침', name: '감자 들깨 노른자 비빔' }, 
+                    { badge: '소스①', name: '소고기 가지 토마토 덮밥' }, 
+                    { badge: '소스②', badgeColor: 'bg-sky-100 text-sky-700', name: '대구살 감자 브로콜리 덮밥' } 
+                ]},
+                { id: 'thu', day: '목', meals: [ 
+                    { type: '아침', name: '연두부 노른자 몽글찜' }, 
+                    { badge: '소스③', badgeColor: 'bg-amber-100 text-amber-700', name: '닭안심 당근 시금치 덮밥' }, 
+                    { badge: '소스④', badgeColor: 'bg-pink-100 text-pink-700', name: '돼지안심 버섯 배추 조림' } 
+                ]},
+                { id: 'fri', day: '금', meals: [ 
+                    { type: '아침', name: '단호박 치즈 매시 볼' }, 
+                    { badge: '소스④', badgeColor: 'bg-pink-100 text-pink-700', name: '돼지안심 버섯 배추 조림' }, 
+                    { badge: '소스③', badgeColor: 'bg-amber-100 text-amber-700', name: '닭안심 당근 시금치 덮밥' } 
+                ]},
+                { id: 'sat', day: '토', meals: [ 
+                    { type: '아침', name: '감자 들깨 노른자 비빔' }, 
+                    { badge: '소스③', badgeColor: 'bg-amber-100 text-amber-700', name: '닭안심 당근 시금치 덮밥' }, 
+                    { badge: '소스④', badgeColor: 'bg-pink-100 text-pink-700', name: '돼지안심 버섯 배추 조림' } 
+                ]},
+                { id: 'sun', day: '일', meals: [ 
+                    { type: '아침', name: '바나나 오트밀 포리지 (노른자)' }, 
+                    { badge: '냉파', badgeColor:'bg-gray-200 text-gray-700', name: '냉동고 잔여 소스 소진' }, 
+                    { badge: '특식', badgeColor:'bg-emerald-100 text-emerald-800', name: '연어 애호박 맑은 리조또' } 
+                ]}
+            ]
+        };
+
+        // ----------------------------------------------------
+        // State Management
+        // ----------------------------------------------------
+        let currentTab = 'plan';
+        let currentWeek = 'A'; // 'A' or 'B'
+        
+        // 장보기 목록 체크 상태만 저장 (식단표 도장 기능 제거)
+        let state = {
+            groceries: JSON.parse(localStorage.getItem('twinsGroceries')) || {}
+        };
+
+        function saveState() {
+            localStorage.setItem('twinsGroceries', JSON.stringify(state.groceries));
+        }
+
+        // ----------------------------------------------------
+        // App Rendering
+        // ----------------------------------------------------
+        const appContent = document.getElementById('app-content');
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+            // Update Nav Styles
+            ['plan', 'prep', 'grocery'].forEach(id => {
+                const btn = document.getElementById(`nav-${id}`);
+                if (id === tabId) {
+                    btn.classList.replace('text-gray-400', 'text-primary');
+                } else {
+                    btn.classList.replace('text-primary', 'text-gray-400');
+                }
+            });
+            render();
+        }
+
+        function render() {
+            appContent.innerHTML = ''; // clear
+            
+            if (currentTab === 'plan') renderPlanTab();
+            else if (currentTab === 'prep') renderPrepTab();
+            else if (currentTab === 'grocery') renderGroceryTab();
+        }
+
+        // --- TAB 1: Meal Plan (Card-based UI) ---
+        function renderPlanTab() {
+            let html = `
+                <div class="p-4 safe-pt">
+                    <!-- 주차 선택 버튼 -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-1.5 flex justify-between items-center mb-5">
+                        <button onclick="toggleWeek('A')" class="${currentWeek === 'A' ? 'bg-primary text-white shadow-md' : 'text-gray-400'} flex-1 py-2.5 rounded-xl font-bold text-sm transition">1주차 (A플랜)</button>
+                        <button onclick="toggleWeek('B')" class="${currentWeek === 'B' ? 'bg-primary text-white shadow-md' : 'text-gray-400'} flex-1 py-2.5 rounded-xl font-bold text-sm transition">2주차 (B플랜)</button>
+                    </div>
+                    
+                    <div class="space-y-5">
+            `;
+
+            MEAL_PLAN[currentWeek].forEach(day => {
+                const isWeekend = day.id === 'sat' || day.id === 'sun';
+                const m1 = day.meals[0];
+                const m2 = day.meals[1];
+                const m3 = day.meals[2];
+                
+                const bBadge2 = m2.badgeColor || 'bg-rose-100 text-rose-700';
+                const bBadge3 = m3.badgeColor || 'bg-rose-100 text-rose-700';
+
+                html += `
+                    <!-- 하루 단위 카드 -->
+                    <div class="bg-white rounded-3xl shadow-sm border ${isWeekend ? 'border-amber-200' : 'border-gray-100'} overflow-hidden">
+                        <div class="${isWeekend ? 'bg-amber-50 text-amber-800 border-amber-100' : 'bg-gray-50 text-gray-800 border-gray-100'} border-b px-5 py-3 font-extrabold text-[15px] flex justify-between items-center">
+                            <span>${day.day}요일 식단</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <!-- 아침 (🌅) -->
+                            <div class="flex items-center p-3.5 bg-orange-50/50 border-b border-white">
+                                <div class="w-14 flex flex-col items-center justify-center text-orange-500">
+                                    <span class="text-[22px] drop-shadow-sm">🌅</span>
+                                    <span class="text-[10px] font-bold mt-1">아침</span>
+                                </div>
+                                <div class="flex-1 pl-3">
+                                    <span class="text-[14px] font-bold text-gray-800">${m1.name}</span>
+                                </div>
+                            </div>
+                            
+                            <!-- 점심 (☀️) -->
+                            <div class="flex items-center p-3.5 bg-blue-50/50 border-b border-white">
+                                <div class="w-14 flex flex-col items-center justify-center text-blue-500">
+                                    <span class="text-[22px] drop-shadow-sm">☀️</span>
+                                    <span class="text-[10px] font-bold mt-1">점심</span>
+                                </div>
+                                <div class="flex-1 pl-3">
+                                    ${m2.badge ? `<span class="text-[10px] px-1.5 py-0.5 rounded font-bold ${bBadge2} inline-block mb-1">${m2.badge}</span><br>` : ''}
+                                    <span class="text-[14px] font-bold text-gray-800">${m2.name}</span>
+                                </div>
+                            </div>
+                            
+                            <!-- 저녁 (🌙) -->
+                            <div class="flex items-center p-3.5 bg-indigo-50/50">
+                                <div class="w-14 flex flex-col items-center justify-center text-indigo-500">
+                                    <span class="text-[22px] drop-shadow-sm">🌙</span>
+                                    <span class="text-[10px] font-bold mt-1">저녁</span>
+                                </div>
+                                <div class="flex-1 pl-3">
+                                    ${m3.badge ? `<span class="text-[10px] px-1.5 py-0.5 rounded font-bold ${bBadge3} inline-block mb-1">${m3.badge}</span><br>` : ''}
+                                    <span class="text-[14px] font-bold text-gray-800">${m3.name}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `</div></div>`;
+            appContent.innerHTML = html;
+        }
+
+        function toggleWeek(week) {
+            currentWeek = week;
+            render();
+        }
+
+        // --- TAB 2: Meal Prep (Static Guides) ---
+        function renderPrepTab() {
+            appContent.innerHTML = `
+                <div class="p-4 safe-pt space-y-5">
+                    <div class="bg-gradient-to-br from-primary to-secondary rounded-2xl p-5 text-white shadow-md">
+                        <h2 class="text-xl font-bold mb-2">쌍둥이 조리 공식</h2>
+                        <p class="text-sm opacity-90 mb-4">한 번에 300g (총 6그릇/3끼 분량) 만들어 100ml 내열용기 3통으로 소분.</p>
+                        <div class="grid grid-cols-2 gap-3 text-sm font-medium">
+                            <div class="bg-white/20 p-3 rounded-xl">고기: 120~140g</div>
+                            <div class="bg-white/20 p-3 rounded-xl">채소: 120~150g</div>
+                            <div class="bg-white/20 p-3 rounded-xl">채수: 250~300ml</div>
+                            <div class="bg-white/20 p-3 rounded-xl">전분: 1티스푼</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                        <h3 class="font-bold text-lg text-rose-600 flex items-center gap-2 mb-3"><span class="bg-rose-100 px-2 py-1 rounded">일</span> 대량 생산 (소스 1/2)</h3>
+                        <ul class="text-sm text-gray-600 space-y-3 list-disc list-inside">
+                            <li><strong>냄비1 (소스①):</strong> 소고기+채소+채수 끓인 후 전분물 마무리. 3통 소분(냉동)</li>
+                            <li><strong>냄비2 (소스②):</strong> 새우/생선+채소 끓이다 순두부 투하. 3통 소분(냉동)</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                        <h3 class="font-bold text-lg text-amber-600 flex items-center gap-2 mb-3"><span class="bg-amber-100 px-2 py-1 rounded">수</span> 교체 생산 (소스 3/4)</h3>
+                        <ul class="text-sm text-gray-600 space-y-3 list-disc list-inside">
+                            <li><strong>냄비1 (소스③):</strong> 닭안심+채수+우유(분유) 졸이기. 3통 소분</li>
+                            <li><strong>냄비2 (소스④):</strong> 돼지안심+사과퓨레 졸이기. 3통 소분</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- TAB 3: Groceries ---
+        function renderGroceryTab() {
+            let html = `
+                <div class="p-4 safe-pt">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-900">장보기 체크리스트</h2>
+                        <button onclick="resetGroceries()" class="text-xs font-bold text-red-500 bg-red-50 px-3 py-1.5 rounded-lg active:bg-red-100">초기화</button>
+                    </div>
+                    <div class="space-y-4">
+            `;
+
+            GROCERY_DATA.forEach(group => {
+                html += `
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+                        <h3 class="font-bold text-primary mb-3 pb-2 border-b border-gray-50">${group.category}</h3>
+                        <div class="space-y-1">
+                `;
+                group.items.forEach(item => {
+                    const isChecked = state.groceries[item.id];
+                    html += `
+                        <label class="flex items-center gap-3 p-2 rounded-xl active:bg-gray-50 cursor-pointer">
+                            <input type="checkbox" class="custom-checkbox shrink-0" ${isChecked ? 'checked' : ''} onchange="toggleGrocery('${item.id}')">
+                            <span class="text-sm font-medium transition-all ${isChecked ? 'text-gray-400 line-through' : 'text-gray-800'}">${item.name}</span>
+                        </label>
+                    `;
+                });
+                html += `</div></div>`;
+            });
+            html += `</div></div>`;
+            appContent.innerHTML = html;
+        }
+
+        function toggleGrocery(id) {
+            state.groceries[id] = !state.groceries[id];
+            saveState();
+            // 약간의 딜레이를 주어 체크박스 애니메이션이 보인 뒤 렌더링되도록 함
+            setTimeout(render, 150); 
+        }
+
+        function resetGroceries() {
+            if(confirm('장보기 목록을 모두 초기화할까요?')) {
+                state.groceries = {};
+                saveState();
+                render();
+            }
+        }
+
+        // ----------------------------------------------------
+        // Utilities
+        // ----------------------------------------------------
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        // Initial Load
+        render();
+    </script>
+</body>
+</html>
